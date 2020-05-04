@@ -3,15 +3,19 @@ package com.rikus
 import java.io.ByteArrayOutputStream
 import java.math.BigInteger
 
+import akka.actor.{Actor, ActorLogging}
+import com.rikus.Direction.Direction
 import com.typesafe.scalalogging.LazyLogging
 import com.sksamuel.avro4s.{AvroInputStream, AvroOutputStream, AvroSchema}
-
 import scodec._
 import scodec.bits.BitVector
 import scodec.codecs._
 
+import scala.collection.mutable.ListBuffer
+
 // Define message type for scodec
 case class ElevatorControl(tpe: Int, aux: Int, elat: Int, elon: Int, temp: Int, volt: Int)
+
 case class ElevatorControlDecoded(tpe: String, aux: String, lat: Double, lon: Double, temp: Double, volt: Double)
 
 object ElevatorControl extends LazyLogging {
@@ -24,7 +28,7 @@ object ElevatorControl extends LazyLogging {
 
   def decoded(bitVector: BitVector): Attempt[DecodeResult[ElevatorControl]] = codec.decode(bitVector)
 
-  def decode(data:String) = {
+  def decode(data: String) = {
     val bs: Array[Byte] = new BigInteger(data, 16).toByteArray
     val bits: BitVector = if (BitVector(bs).sizeLessThan(96)) BitVector(bs).padLeft(96) else BitVector(bs).slice(0, 96)
     val decodedMessage = decoded(bits).toOption.map(m => m.value) match {
@@ -86,4 +90,37 @@ object ElevatorControlDecoded {
     deserializedSensorMsg
   }
 }
+
+object Direction extends Enumeration {
+  type Direction = Value
+  val UP, DOWN = Value
+}
+
+case class createElevator()
+
+case class elevatorStatus(currentFloor: Int, destinationFloor: Int)
+
+case class getStatus()
+
+case class pickup(floor: Int, direction: Direction)
+
+case class step()
+case class status()
+
+case class Elevator(id: Int, initialState: (0, 0)) extends Actor with ActorLogging {
+  var currentStatus = elevatorStatus(initialState._1, initialState._2)
+  val destinations = ListBuffer.empty[Int]
+  def receive: Receive = {
+    case statusRequest:status => sender() ! currentStatus
+    case pickupRequest:pickup => ???
+    case stepRequest:step => ???
+  }
+}
+
+case class ElevatorSupervisor() extends Actor with ActorLogging {
+  def receive: Receive = {
+    case create: createElevator => ???
+  }
+}
+
 

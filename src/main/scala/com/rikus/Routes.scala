@@ -47,8 +47,6 @@ class Routes()(implicit val system: ActorSystem) extends LazyLogging {
             post {
               entity(as[String]) { data =>
                 val decodedMessage = ElevatorControl.decode(data)
-                kafkaCon.sendToKafka("ElevatorControl", decodedMessage.toJson.toString())
-                elasticCon.sendToElastic("ElevatorControl", decodedMessage, UUID.randomUUID().toString)
                 complete(HttpEntity(ContentTypes.`application/json`, decodedMessage.toJson.toString()))
               }
             }
