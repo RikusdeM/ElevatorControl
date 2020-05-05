@@ -57,9 +57,8 @@ class Routes()(implicit val system: ActorSystem) extends LazyLogging {
       pathPrefix("ElevatorControl") {
         path("status") {
           get {
-            val futResult = Await.result(elevatorSystemSupervisor ? new status(),10.seconds)
-            futResult.toString()
-            complete(HttpEntity(ContentTypes.`application/json`, futResult.toString()))
+            elevatorSystemSupervisor ! new status()
+            complete(HttpEntity(ContentTypes.`application/json`, "getting status ..."))
           }
         }
       }

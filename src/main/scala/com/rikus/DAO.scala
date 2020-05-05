@@ -141,13 +141,13 @@ case class ElevatorSupervisor() extends Actor with ActorLogging {
   def receive: Receive = {
     case createElevator(id) =>
       val elevatorRef = context.actorOf(Props(new Elevator(id, (0, 0))), name = s"elevator-${id}")
-      log.info(s"${elevatorRef.toString()} has been created")
+      log.info(Console.YELLOW + s"${elevatorRef.toString()} has been created" + Console.WHITE )
     case statusRequest: status => context.children.map(child => {
       log.info(s"Calling Child status : ${child.toString()}")
       child ! statusRequest
     }) //query all children elevators
     case stepRequest: step => context.children.foreach(child => child ! stepRequest) //step all children elevators
-    case elevatorStatus(currentFloor,destinationFloor) => log.info(s"CurrentFloor: ${currentFloor} : DestinationFloor: ${destinationFloor}")
+    case elevatorStatus(currentFloor,destinationFloor) => log.info(Console.GREEN + s"${sender()} : CurrentFloor: ${currentFloor} : DestinationFloor: ${destinationFloor}" + Console.WHITE)
   }
 }
 
