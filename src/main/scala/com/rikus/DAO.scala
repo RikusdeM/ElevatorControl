@@ -139,7 +139,7 @@ case class Elevator(id: Int, initialState: (0, 0)) extends Actor with ActorLoggi
 case class ElevatorSupervisor() extends Actor with ActorLogging {
   def receive: Receive = {
     case createElevator(id) =>
-      val elevatorRef = context.actorOf(Props(new Elevator(id, (0, 0))), name = s"elevator_${}")
+      val elevatorRef = context.actorOf(Props(new Elevator(id, (0, 0))), name = s"elevator-${id}")
       log.info(s"${elevatorRef.toString()} has been created")
     case statusRequest: status => context.children.map(child => {
       val childStatus = (child ? statusRequest).asInstanceOf[Future[elevatorStatus]]

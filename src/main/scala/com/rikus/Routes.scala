@@ -10,10 +10,11 @@ import akka.http.scaladsl.server.Route
 import akka.actor._
 import akka.util.{ByteString, Timeout}
 import akka.pattern.ask
-import com.rikus.QuickstartApp.system
 import com.typesafe.scalalogging.LazyLogging
 import spray.json._
+import scala.concurrent.duration._
 
+import scala.concurrent.Await
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class Routes()(implicit val system: ActorSystem) extends LazyLogging {
@@ -24,7 +25,7 @@ class Routes()(implicit val system: ActorSystem) extends LazyLogging {
   import QuickstartApp._
   import Configurations.configFactory
 
-  val elevatorSystemSupervisor = system.actorOf(Props[ElevatorSupervisor],name="ElevatorSupervisor")
+  val elevatorSystemSupervisor = system.actorOf(Props[ElevatorSupervisor], name = "ElevatorSupervisor")
 
   def myUserPassAuthenticator(credentials: Credentials): Option[String] =
     credentials match {
@@ -34,31 +35,29 @@ class Routes()(implicit val system: ActorSystem) extends LazyLogging {
 
   // If ask takes more time than this to complete the request is failed
   private implicit val timeout: Timeout = Timeout.create(system.settings.config.getDuration("my-app.routes.ask-timeout"))
-  val route: Route = Route.seal {
-    authenticateBasic(realm = "secure site", myUserPassAuthenticator) { userName =>
-      path("hello") {
-        get {
-          complete(HttpEntity(ContentTypes.`text/html(UTF-8)`, "<h1>Say hello to akka-http</h1>"))
+  val route: Route = Route {
+    path("hello") {
+      get {
+        complete(HttpEntity(ContentTypes.`text/html(UTF-8)`, "<h1>Say hello to akka-http</h1>"))
+      }
+    } ~
+      pathPrefix("ElevatorControl") {
+        path("createElevator" / Segment) { elevatorId: String =>
+          get {
+            elevatorSystemSupervisor ! createElevator(elevatorId.toInt)
+            complete(HttpEntity(ContentTypes.`application/json`, "creating"))
+          }
         }
       } ~
-        pathPrefix("ElevatorControl") {
-          path("createElevator"/ Segment) { elevatorId:Int =>
-            get {
-                  val createFut = elevatorSystemSupervisor ? createElevator(elevatorId)
+      pathPrefix("ElevatorControl") {
+        path("decode") {
+          post {
+            entity(as[String]) { data =>
+              val decodedMessage = ElevatorControl.decode(data)
               complete(HttpEntity(ContentTypes.`application/json`, decodedMessage.toJson.toString()))
             }
           }
-        } ~
-        pathPrefix("ElevatorControl") {
-          path("decode") {
-            post {
-              entity(as[String]) { data =>
-                val decodedMessage = ElevatorControl.decode(data)
-                complete(HttpEntity(ContentTypes.`application/json`, decodedMessage.toJson.toString()))
-              }
-            }
-          }
         }
-    }
+      }
   }
 }
