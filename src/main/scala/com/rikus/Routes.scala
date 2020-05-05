@@ -2,14 +2,18 @@ package com.rikus
 
 import java.math.BigInteger
 import java.util.UUID
+
 import akka.http.scaladsl.server.directives.Credentials
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.model.{ContentTypes, HttpEntity, HttpMethods, HttpRequest, HttpResponse, MediaRanges, MediaTypes, StatusCodes}
 import akka.http.scaladsl.server.Route
 import akka.actor._
 import akka.util.{ByteString, Timeout}
+import akka.pattern.ask
+import com.rikus.QuickstartApp.system
 import com.typesafe.scalalogging.LazyLogging
 import spray.json._
+
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class Routes()(implicit val system: ActorSystem) extends LazyLogging {
@@ -19,6 +23,8 @@ class Routes()(implicit val system: ActorSystem) extends LazyLogging {
   import JsonFormats._
   import QuickstartApp._
   import Configurations.configFactory
+
+  val elevatorSystemSupervisor = system.actorOf(Props[ElevatorSupervisor],name="ElevatorSupervisor")
 
   def myUserPassAuthenticator(credentials: Credentials): Option[String] =
     credentials match {
@@ -36,9 +42,10 @@ class Routes()(implicit val system: ActorSystem) extends LazyLogging {
         }
       } ~
         pathPrefix("ElevatorControl") {
-          path("encode") {
-            post {
-              ???
+          path("createElevator"/ Segment) { elevatorId:Int =>
+            get {
+                  val createFut = elevatorSystemSupervisor ? createElevator(elevatorId)
+              complete(HttpEntity(ContentTypes.`application/json`, decodedMessage.toJson.toString()))
             }
           }
         } ~

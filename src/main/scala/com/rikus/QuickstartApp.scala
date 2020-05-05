@@ -2,11 +2,12 @@ package com.rikus
 
 import scala.util.Failure
 import scala.util.Success
-import akka.actor.ActorSystem
+import scala.concurrent.duration._
+import akka.actor.{ActorSystem, Props}
 import akka.http.scaladsl.Http
 import akka.stream.ActorMaterializer
+import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
-import ee.mn8.connectors._
 
 
 object Configurations {
@@ -18,16 +19,13 @@ object QuickstartApp extends App {
   implicit val system = ActorSystem("ElevatorControlServer")
   implicit val materializer = ActorMaterializer()
   implicit val executionContext = system.dispatcher
+  implicit val timeout = Timeout(3.seconds)
+//  val elevatorSystem = system.actorOf(Props[ElevatorSupervisor],name="ElevatorSupervisor")
 
   val routes = new Routes()(system)
   val servicePort = Configurations.configFactory.getInt("my-app.routes.servicePort")
   val futureBinding = Http().bindAndHandle(routes.route, "0.0.0.0", servicePort)
-  val kafkaCon = new KafkaConn()
-  val elasticCon = new ElasticConn(Configurations.configFactory.getString("elasticsearch.host"),
-    Configurations.configFactory.getInt("elasticsearch.port"),
-    Configurations.configFactory.getString("elasticsearch.jksPassword"),
-    Configurations.configFactory.getString("elasticsearch.username"),
-    Configurations.configFactory.getString("elasticsearch.password"))
+
 
   futureBinding.onComplete {
     case Success(binding) =>

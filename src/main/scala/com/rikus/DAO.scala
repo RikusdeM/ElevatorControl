@@ -1,10 +1,17 @@
 package com.rikus
 
+
+import com.rikus.Direction.Direction
+import com.rikus.QuickstartApp._
 import java.io.ByteArrayOutputStream
 import java.math.BigInteger
 
-import akka.actor.{Actor, ActorLogging}
-import com.rikus.Direction.Direction
+import akka.actor.{Actor, ActorLogging, Props}
+import akka.pattern.ask
+import akka.util.Timeout
+
+import scala.concurrent.{Await, Future}
+import scala.concurrent.duration._
 import com.typesafe.scalalogging.LazyLogging
 import com.sksamuel.avro4s.{AvroInputStream, AvroOutputStream, AvroSchema}
 import scodec._
@@ -96,30 +103,49 @@ object Direction extends Enumeration {
   val UP, DOWN = Value
 }
 
-case class createElevator()
+case class createElevator(id: Int)
 
 case class elevatorStatus(currentFloor: Int, destinationFloor: Int)
-
-case class getStatus()
 
 case class pickup(floor: Int, direction: Direction)
 
 case class step()
+
 case class status()
 
 case class Elevator(id: Int, initialState: (0, 0)) extends Actor with ActorLogging {
-  var currentStatus = elevatorStatus(initialState._1, initialState._2)
-  val destinations = ListBuffer.empty[Int]
+  var currentStatus: elevatorStatus = elevatorStatus(initialState._1, initialState._2)
+  val destinations: scala.collection.mutable.ListBuffer[Int] = ListBuffer.empty[Int]
+
+  def nextDestination = {
+    destinations.headOption match {
+      case Some(floorDest) =>
+        destinations -= floorDest
+        floorDest
+      case None =>
+        log.info("No known next destination")
+        0
+    }
+
+  }
+
   def receive: Receive = {
-    case statusRequest:status => sender() ! currentStatus
-    case pickupRequest:pickup => ???
-    case stepRequest:step => ???
+    case statusRequest: status => sender() ! currentStatus
+    case pickup(floor, direction) => destinations += floor
+    case stepRequest: step => currentStatus = currentStatus.copy(currentStatus.destinationFloor,nextDestination) //change current status to next destination and remove that destination from pool
   }
 }
 
 case class ElevatorSupervisor() extends Actor with ActorLogging {
   def receive: Receive = {
-    case create: createElevator => ???
+    case createElevator(id) =>
+      val elevatorRef = context.actorOf(Props(new Elevator(id, (0, 0))), name = s"elevator_${}")
+      log.info(s"${elevatorRef.toString()} has been created")
+    case statusRequest: status => context.children.map(child => {
+      val childStatus = (child ? statusRequest).asInstanceOf[Future[elevatorStatus]]
+      childStatus
+    }) //query all children elevators
+    case stepRequest: step => context.children.foreach(child => child ! stepRequest) //step all children elevators
   }
 }
 
