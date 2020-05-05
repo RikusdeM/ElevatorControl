@@ -109,6 +109,8 @@ case class elevatorStatus(currentFloor: Int, destinationFloor: Int)
 
 case class pickup(floor: Int, direction: Direction)
 
+case class pickupReq(id: Int, floor: Int, direction: Direction)
+
 case class step()
 
 case class status()
@@ -132,7 +134,10 @@ case class Elevator(id: Int, initialState: (0, 0)) extends Actor with ActorLoggi
     case statusRequest: status =>
       log.info(s"Elevator ${this.id} sending status ...")
       sender() ! currentStatus
-    case pickup(floor, direction) => destinations += floor
+    case pickup(floor, direction) =>
+      if (!destinations.contains(floor))
+        destinations += floor
+      log.info(s"Pickups for ${self} now include : ${destinations.toList}")
     case stepRequest: step => currentStatus = currentStatus.copy(currentStatus.destinationFloor, nextDestination) //change current status to next destination and remove that destination from pool
   }
 }
@@ -141,13 +146,17 @@ case class ElevatorSupervisor() extends Actor with ActorLogging {
   def receive: Receive = {
     case createElevator(id) =>
       val elevatorRef = context.actorOf(Props(new Elevator(id, (0, 0))), name = s"elevator-${id}")
-      log.info(Console.YELLOW + s"${elevatorRef.toString()} has been created" + Console.WHITE )
+      log.info(Console.YELLOW + s"${elevatorRef.toString()} has been created" + Console.WHITE)
     case statusRequest: status => context.children.map(child => {
       log.info(s"Calling Child status : ${child.toString()}")
       child ! statusRequest
     }) //query all children elevators
     case stepRequest: step => context.children.foreach(child => child ! stepRequest) //step all children elevators
-    case elevatorStatus(currentFloor,destinationFloor) => log.info(Console.GREEN + s"${sender()} : CurrentFloor: ${currentFloor} : DestinationFloor: ${destinationFloor}" + Console.WHITE)
+    case elevatorStatus(currentFloor, destinationFloor) => log.info(Console.GREEN + s"${sender()} : CurrentFloor: ${currentFloor} : DestinationFloor: ${destinationFloor}" + Console.WHITE)
+    case pickupReq(id, floor, direction) => context.child(s"elevator-${id}") match {
+      case Some(childRef) => childRef ! pickup(floor, direction)
+      case None => log.info(s"No such child with id # ${id}")
+    }
   }
 }
 

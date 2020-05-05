@@ -1,6 +1,6 @@
 import scala.collection.mutable.ListBuffer
 
-val destinations = ListBuffer.empty[Int]
+val destinations = ListBuffer.empty[Int].distinct
 destinations += 1
 
 println(destinations)
@@ -11,4 +11,6 @@ println(destinations)
 
 destinations -= 1
 
+destinations += 3
 println(destinations)
+

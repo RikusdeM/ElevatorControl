@@ -47,6 +47,20 @@ class Routes()(implicit val system: ActorSystem) extends LazyLogging {
         }
       } ~
       pathPrefix("ElevatorControl") {
+        path("pickup") {
+          parameters('id.as[String], 'floor.as[String].?, 'direction.as[String].?) { (id, floor, direction) =>
+            get {
+              val dir = direction.getOrElse("up") match {
+                case "up" => Direction.UP
+                case "down" => Direction.DOWN
+              }
+              elevatorSystemSupervisor ! new pickupReq(id.toInt, floor.get.toInt, dir)
+              complete(HttpEntity(ContentTypes.`application/json`, "new pickup"))
+            }
+          }
+        }
+      } ~
+      pathPrefix("ElevatorControl") {
         path("step") {
           get {
             elevatorSystemSupervisor ! new step()
