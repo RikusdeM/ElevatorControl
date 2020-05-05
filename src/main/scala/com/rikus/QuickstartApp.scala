@@ -19,8 +19,7 @@ object QuickstartApp extends App {
   implicit val system = ActorSystem("ElevatorControlServer")
   implicit val materializer = ActorMaterializer()
   implicit val executionContext = system.dispatcher
-  implicit val timeout = Timeout(3.seconds)
-//  val elevatorSystem = system.actorOf(Props[ElevatorSupervisor],name="ElevatorSupervisor")
+  implicit val timeout: Timeout = Timeout.create(system.settings.config.getDuration("my-app.routes.ask-timeout"))
 
   val routes = new Routes()(system)
   val servicePort = Configurations.configFactory.getInt("my-app.routes.servicePort")

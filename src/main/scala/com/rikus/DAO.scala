@@ -126,13 +126,14 @@ case class Elevator(id: Int, initialState: (0, 0)) extends Actor with ActorLoggi
         log.info("No known next destination")
         0
     }
-
   }
 
   def receive: Receive = {
-    case statusRequest: status => sender() ! currentStatus
+    case statusRequest: status =>
+      log.info(s"Elevator ${this.id} sending status ...")
+      sender() ! currentStatus
     case pickup(floor, direction) => destinations += floor
-    case stepRequest: step => currentStatus = currentStatus.copy(currentStatus.destinationFloor,nextDestination) //change current status to next destination and remove that destination from pool
+    case stepRequest: step => currentStatus = currentStatus.copy(currentStatus.destinationFloor, nextDestination) //change current status to next destination and remove that destination from pool
   }
 }
 
@@ -142,10 +143,11 @@ case class ElevatorSupervisor() extends Actor with ActorLogging {
       val elevatorRef = context.actorOf(Props(new Elevator(id, (0, 0))), name = s"elevator-${id}")
       log.info(s"${elevatorRef.toString()} has been created")
     case statusRequest: status => context.children.map(child => {
-      val childStatus = (child ? statusRequest).asInstanceOf[Future[elevatorStatus]]
-      childStatus
+      log.info(s"Calling Child status : ${child.toString()}")
+      child ! statusRequest
     }) //query all children elevators
     case stepRequest: step => context.children.foreach(child => child ! stepRequest) //step all children elevators
+    case elevatorStatus(currentFloor,destinationFloor) => log.info(s"CurrentFloor: ${currentFloor} : DestinationFloor: ${destinationFloor}")
   }
 }
 

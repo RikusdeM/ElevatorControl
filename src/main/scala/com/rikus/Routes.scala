@@ -19,7 +19,6 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 class Routes()(implicit val system: ActorSystem) extends LazyLogging {
 
-
   import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
   import JsonFormats._
   import QuickstartApp._
@@ -33,8 +32,6 @@ class Routes()(implicit val system: ActorSystem) extends LazyLogging {
       case _ => None
     }
 
-  // If ask takes more time than this to complete the request is failed
-  private implicit val timeout: Timeout = Timeout.create(system.settings.config.getDuration("my-app.routes.ask-timeout"))
   val route: Route = Route {
     path("hello") {
       get {
@@ -50,14 +47,32 @@ class Routes()(implicit val system: ActorSystem) extends LazyLogging {
         }
       } ~
       pathPrefix("ElevatorControl") {
-        path("decode") {
-          post {
-            entity(as[String]) { data =>
-              val decodedMessage = ElevatorControl.decode(data)
-              complete(HttpEntity(ContentTypes.`application/json`, decodedMessage.toJson.toString()))
-            }
+        path("step") {
+          get {
+            elevatorSystemSupervisor ! new step()
+            complete(HttpEntity(ContentTypes.`application/json`, "step"))
+          }
+        }
+      } ~
+      pathPrefix("ElevatorControl") {
+        path("status") {
+          get {
+            val futResult = Await.result(elevatorSystemSupervisor ? new status(),10.seconds)
+            futResult.toString()
+            complete(HttpEntity(ContentTypes.`application/json`, futResult.toString()))
           }
         }
       }
+
+    //      pathPrefix("ElevatorControl") {
+    //        path("decode") {
+    //          post {
+    //            entity(as[String]) { data =>
+    //              val decodedMessage = ElevatorControl.decode(data)
+    //              complete(HttpEntity(ContentTypes.`application/json`, decodedMessage.toJson.toString()))
+    //            }
+    //          }
+    //        }
+    //      }
   }
 }
