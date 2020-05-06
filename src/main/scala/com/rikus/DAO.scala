@@ -111,6 +111,10 @@ case class pickup(floor: Int, direction: Direction)
 
 case class pickupReq(id: Int, floor: Int, direction: Direction)
 
+case class dropOff(floor: Int)
+
+case class dropOffReq(id: Int, floor: Int)
+
 case class step()
 
 case class status()
@@ -130,15 +134,22 @@ case class Elevator(id: Int, initialState: (0, 0)) extends Actor with ActorLoggi
     }
   }
 
+  def addDestination(floor: Int) = {
+    if (!destinations.contains(floor))
+      destinations += floor
+  }
+
   def receive: Receive = {
     case statusRequest: status =>
       log.info(s"Elevator ${this.id} sending status ...")
       sender() ! currentStatus
     case pickup(floor, direction) =>
-      if (!destinations.contains(floor))
-        destinations += floor
-      log.info(s"Pickups for ${self} now include : ${destinations.toList}")
+      addDestination(floor)
+      log.info(s"Destinations for ${self} now include : ${destinations.toList}")
     case stepRequest: step => currentStatus = currentStatus.copy(currentStatus.destinationFloor, nextDestination) //change current status to next destination and remove that destination from pool
+    case dropOff(floor) =>
+      addDestination(floor)
+      log.info(s"Destinations for ${self} now include : ${destinations.toList}")
   }
 }
 
@@ -155,6 +166,10 @@ case class ElevatorSupervisor() extends Actor with ActorLogging {
     case elevatorStatus(currentFloor, destinationFloor) => log.info(Console.GREEN + s"${sender()} : CurrentFloor: ${currentFloor} : DestinationFloor: ${destinationFloor}" + Console.WHITE)
     case pickupReq(id, floor, direction) => context.child(s"elevator-${id}") match {
       case Some(childRef) => childRef ! pickup(floor, direction)
+      case None => log.info(s"No such child with id # ${id}")
+    }
+    case dropOffReq(id, floor) => context.child(s"elevator-${id}") match {
+      case Some(childRef) => childRef ! dropOff(floor)
       case None => log.info(s"No such child with id # ${id}")
     }
   }
