@@ -1,12 +1,13 @@
 package com.rikus.dao
 
 import akka.actor.{Actor, ActorLogging}
+import com.rikus.dao.Direction.Direction
 
 import scala.collection.mutable.ListBuffer
 
 case class Elevator(id: Int, initialState: (0, 0)) extends Actor with ActorLogging {
   var currentStatus: elevatorStatus = elevatorStatus(initialState._1, initialState._2)
-  val destinations: scala.collection.mutable.ListBuffer[Int] = ListBuffer.empty[Int]
+  val destinations: scala.collection.mutable.ListBuffer[(Int,Option[Direction])] = ListBuffer.empty[(Int, Option[Direction])] //todo : Fix to incorporate direction into destinations
 
   def nextDestination = {
     destinations.headOption match {
