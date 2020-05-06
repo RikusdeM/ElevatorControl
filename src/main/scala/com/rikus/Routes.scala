@@ -10,10 +10,11 @@ import akka.http.scaladsl.server.Route
 import akka.actor._
 import akka.util.{ByteString, Timeout}
 import akka.pattern.ask
+import com.rikus.dao.{Direction, ElevatorSupervisor, createElevator, dropOffReq, pickupReq, status, step}
 import com.typesafe.scalalogging.LazyLogging
 import spray.json._
-import scala.concurrent.duration._
 
+import scala.concurrent.duration._
 import scala.concurrent.Await
 import scala.concurrent.ExecutionContext.Implicits.global
 
