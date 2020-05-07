@@ -11,7 +11,8 @@ case class Elevator(id: Int, initialState: (0, 0)) extends Actor with ActorLoggi
 
   def nextDestination = {
     destinations.headOption match {
-      case Some(floorDest) =>
+      case Some((floorDest,direction)) =>
+        // todo : Fix the next destination smart logic 
         destinations -= floorDest
         floorDest
       case None =>
@@ -20,9 +21,13 @@ case class Elevator(id: Int, initialState: (0, 0)) extends Actor with ActorLoggi
     }
   }
 
-  def addDestination(floor: Int) = {
-    if (!destinations.contains(floor))
-      destinations += floor
+  def addDestination(floor: Int, direction:Option[Direction]) = {
+
+    if (!(destinations.contains((floor,None)) || destinations.contains((floor,Some(_)))))
+      destinations += ((floor,direction))
+
+//    if (!destinations.contains(floor))
+//      destinations += floor
   }
 
   def receive: Receive = {
@@ -30,11 +35,11 @@ case class Elevator(id: Int, initialState: (0, 0)) extends Actor with ActorLoggi
       log.info(s"Elevator ${this.id} sending status ...")
       sender() ! currentStatus
     case pickup(floor, direction) =>
-      addDestination(floor)
+      addDestination(floor,Some(direction)) //add destination with direction
       log.info(s"Destinations for ${self} now include : ${destinations.toList}")
     case stepRequest: step => currentStatus = currentStatus.copy(currentStatus.destinationFloor, nextDestination) //change current status to next destination and remove that destination from pool
     case dropOff(floor) =>
-      addDestination(floor)
+      addDestination(floor,None)
       log.info(s"Destinations for ${self} now include : ${destinations.toList}")
   }
 }
