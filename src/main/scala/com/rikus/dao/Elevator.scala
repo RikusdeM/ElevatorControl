@@ -5,7 +5,7 @@ import com.rikus.dao.Direction.Direction
 
 import scala.collection.mutable.ListBuffer
 
-case class Elevator(id: Int, initialState: (0, 0), numberOfFloors: Int) extends Actor with ActorLogging {
+case class Elevator(id: Int, initialState: (Int, Int), numberOfFloors: Int) extends Actor with ActorLogging {
   var currentStatus: elevatorStatus = elevatorStatus(initialState._1, initialState._2)
   val destinations: scala.collection.mutable.ListBuffer[(Int, Option[Direction])] = ListBuffer.empty[(Int, Option[Direction])]
 
@@ -102,7 +102,7 @@ case class Elevator(id: Int, initialState: (0, 0), numberOfFloors: Int) extends 
       sender() ! currentStatus
     case pickup(floor, direction) =>
       addDestination(floor, Some(direction)) //add destination with direction
-      log.info(s"Destinations for ${self} now include : ${destinations.toList}")
+      log.info(Console.MAGENTA + s"Destinations for ${self} now include : ${destinations.toList}" + Console.WHITE)
     case stepRequest: step =>
       log.info(s"Stepping to next point")
       currentStatus = currentStatus.copy(currentStatus.destinationFloor, nextDestination._1) //change current status to next destination and remove that destination from pool
