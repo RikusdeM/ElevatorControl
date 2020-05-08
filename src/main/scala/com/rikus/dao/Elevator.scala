@@ -5,61 +5,88 @@ import com.rikus.dao.Direction.Direction
 
 import scala.collection.mutable.ListBuffer
 
-case class Elevator(id: Int, initialState: (0, 0)) extends Actor with ActorLogging {
+case class Elevator(id: Int, initialState: (0, 0), numberOfFloors: Int) extends Actor with ActorLogging {
   var currentStatus: elevatorStatus = elevatorStatus(initialState._1, initialState._2)
   val destinations: scala.collection.mutable.ListBuffer[(Int, Option[Direction])] = ListBuffer.empty[(Int, Option[Direction])]
 
   def nextDestination = {
 
     val acceleration = currentStatus.destinationFloor - currentStatus.currentFloor
+    val ascendingDestinations = destinations.sortBy(dest => dest._1)
     val nextDest = destinations.headOption match {
       case Some((floorDest, direction)) => //always go to the oldest destination first
         val futureDestination = acceleration match {
           case x if x > 0 => {
+            log.info(Console.CYAN + "going up" + Console.WHITE)
             val oldDestination = (floorDest, direction)
             //if there is a destination floor smaller and on the same direction(for pickups) go there
-            val nextDestUp = destinations.map {
-              case (floor, Some(dir)) => {
-                if ((floor <= floorDest) && (dir == Direction.UP))
-                  (floor, Some(dir))
-                else
-                  oldDestination
-              } //pickUp
-              case (floor, None) => {
-                if(floor <= floorDest)
-                  (floor,None)
-              } //dropOff
-            }.asInstanceOf[ListBuffer[(Int,Option[Direction])]]
-            nextDestUp
+            val nextStepUp = ascendingDestinations.headOption match {
+              case Some(destination) =>
+                destination match {
+                  case (floor, Some(direction)) =>
+                    if (direction == Direction.UP)
+                      destination
+                    else
+                      oldDestination
+                  case (floor, None) =>
+                    destination
+                }
+              case None => oldDestination
+            }
+            log.info("Next destionation UP : " + nextStepUp)
+            ListBuffer(nextStepUp)
           } //going up
-          case x if x == 0 => ListBuffer(destinations.head) //standstill
+
+          case x if x == 0 => {
+            log.info(Console.CYAN + "standing still" + Console.WHITE)
+            val oldDestination = (floorDest, direction)
+
+            val nextStep =
+              if (currentStatus.currentFloor <= numberOfFloors / 2) // bottom half
+                ascendingDestinations.headOption match { // next destination up
+                  case Some(destination) => destination
+                  case None => oldDestination
+                }
+              else //top half
+                ascendingDestinations.reverse.headOption match { // next destination down
+                  case Some(destination) => destination
+                  case None => oldDestination
+                }
+            ListBuffer(nextStep)
+          } //standstill
+
           case x if x < 0 => {
+            log.info(Console.CYAN + "going down" + Console.WHITE)
             val oldDestination = (floorDest, direction)
             //if there is a destination floor smaller and on the same direction(for pickups) go there
-            val nextDestDown = destinations.map {
-              case (floor, Some(dir)) => {
-                if ((floor >= floorDest) && (dir == Direction.DOWN))
-                  (floor, Some(dir))
-                else
-                  oldDestination
-              } //pickUp
-              case (floor, None) => {
-                if(floor >= floorDest)
-                  (floor,None)
-              } //dropOff
-            }.asInstanceOf[ListBuffer[(Int,Option[Direction])]]
-            nextDestDown
+            val nextStepDown = ascendingDestinations.reverse.headOption match {
+              case Some(destination) =>
+                destination match {
+                  case (floor, Some(direction)) =>
+                    if (direction == Direction.DOWN)
+                      destination
+                    else
+                      oldDestination
+                  case (floor, None) =>
+                    destination
+                }
+              case None => oldDestination
+            }
+            log.info("Next destionation DOWN : " + nextStepDown)
+            ListBuffer(nextStepDown)
           } // going down
         }
-       val goingTo =  futureDestination.headOption match {
+        log.info("Future Destination : " + futureDestination)
+        val goingTo = futureDestination.headOption match {
           case Some(destination) => destination
           case None => destinations.head
         }
+        log.info(Console.BLUE + "Going to " + goingTo.toString() + Console.WHITE)
         destinations -= goingTo
         goingTo
       case None =>
         log.info("No known next destination")
-        (0,None)
+        (currentStatus.destinationFloor, None)
     }
     nextDest
   }
@@ -76,7 +103,9 @@ case class Elevator(id: Int, initialState: (0, 0)) extends Actor with ActorLoggi
     case pickup(floor, direction) =>
       addDestination(floor, Some(direction)) //add destination with direction
       log.info(s"Destinations for ${self} now include : ${destinations.toList}")
-    case stepRequest: step => currentStatus = currentStatus.copy(currentStatus.destinationFloor, nextDestination._1) //change current status to next destination and remove that destination from pool
+    case stepRequest: step =>
+      log.info(s"Stepping to next point")
+      currentStatus = currentStatus.copy(currentStatus.destinationFloor, nextDestination._1) //change current status to next destination and remove that destination from pool
     case dropOff(floor) =>
       addDestination(floor, None)
       log.info(s"Destinations for ${self} now include : ${destinations.toList}")
