@@ -5,11 +5,7 @@ val conf = com.typesafe.config.ConfigFactory.parseFile(new File("project/applica
 
 lazy val akkaHttpVersion = "10.1.11"
 lazy val akkaVersion = "2.6.5"
-lazy val scodecBitsVersion = "1.1.12"
-lazy val scodecCoreVersion = "1.11.4"
 
-dockerBaseImage := "openjdk:10.0"
-packageName in Docker := "gitlab.mn8.ee:4567/dev/ElevatorControl"
 version in Docker := version.value
 
 lazy val root = (project in file(".")).
@@ -30,8 +26,6 @@ lazy val root = (project in file(".")).
       "com.typesafe.akka" %% "akka-http-spray-json" % akkaHttpVersion,
       "com.typesafe.akka" %% "akka-actor-typed" % akkaVersion,
       "com.typesafe.akka" %% "akka-stream" % akkaVersion,
-      "org.scodec" %% "scodec-bits" % scodecBitsVersion,
-      "org.scodec" %% "scodec-core" % scodecCoreVersion,
       "com.typesafe.scala-logging" %% "scala-logging" % "3.9.2",
       "ch.qos.logback" % "logback-classic" % "1.2.3",
       "com.sksamuel.avro4s" %% "avro4s-core" % "3.0.9",
