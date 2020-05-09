@@ -34,7 +34,7 @@ case class Elevator(id: Int, initialState: (Int, Int), numberOfFloors: Int) exte
               case None => oldDestination
             }
             log.info("Next destionation UP : " + nextStepUp)
-            ListBuffer(nextStepUp)
+            nextStepUp
           } //going up
 
           case x if x == 0 => {
@@ -44,15 +44,57 @@ case class Elevator(id: Int, initialState: (Int, Int), numberOfFloors: Int) exte
             val nextStep =
               if (currentStatus.currentFloor <= numberOfFloors / 2) // bottom half
                 ascendingDestinations.headOption match { // next destination up
-                  case Some(destination) => destination
+                  case Some(destination) => {
+                    destination match {
+                      case ((floor, Some(direction))) => { //pickup
+                        if (destinations.tail.nonEmpty) {
+                          if (floor <= ascendingDestinations.tail.head._1 && (direction == Direction.UP))
+                            destination
+                          else
+                            oldDestination
+                        }
+                        else destination
+                      }
+                      case ((floor, None)) => { //dropOff
+                        if (destinations.tail.nonEmpty) {
+                          if (floor <= ascendingDestinations.tail.head._1)
+                            destination
+                          else
+                            oldDestination
+                        }
+                        else destination
+                      }
+                    }
+                  } // only if smaller than head and going up
                   case None => oldDestination
                 }
               else //top half
                 ascendingDestinations.reverse.headOption match { // next destination down
-                  case Some(destination) => destination
+                  case Some(destination) => {
+                    destination match {
+                      case ((floor, Some(direction))) => { //pickup
+                        if (destinations.tail.nonEmpty) {
+                          if (floor >= ascendingDestinations.reverse.tail.head._1 && (direction == Direction.DOWN))
+                            destination
+                          else
+                            oldDestination
+                        }
+                        else destination
+                      }
+                      case ((floor, None)) => { //dropOff
+                        if (destinations.tail.nonEmpty) {
+                          if (floor >= ascendingDestinations.reverse.tail.head._1)
+                            destination
+                          else
+                            oldDestination
+                        }
+                        else destination
+                      }
+                    }
+                  } // only if smaller than head and going up
                   case None => oldDestination
                 }
-            ListBuffer(nextStep)
+            nextStep
           } //standstill
 
           case x if x < 0 => {
@@ -73,14 +115,15 @@ case class Elevator(id: Int, initialState: (Int, Int), numberOfFloors: Int) exte
               case None => oldDestination
             }
             log.info("Next destionation DOWN : " + nextStepDown)
-            ListBuffer(nextStepDown)
+            nextStepDown
           } // going down
         }
         log.info("Future Destination : " + futureDestination)
-        val goingTo = futureDestination.headOption match {
-          case Some(destination) => destination
-          case None => destinations.head
-        }
+        //        val goingTo = futureDestination.headOption match {
+        //          case Some(destination) => destination
+        //          case None => destinations.head
+        //        }
+        val goingTo = futureDestination
         log.info(Console.BLUE + "Going to " + goingTo.toString() + Console.WHITE)
         destinations -= goingTo
         goingTo
@@ -108,6 +151,6 @@ case class Elevator(id: Int, initialState: (Int, Int), numberOfFloors: Int) exte
       currentStatus = currentStatus.copy(currentStatus.destinationFloor, nextDestination._1) //change current status to next destination and remove that destination from pool
     case dropOff(floor) =>
       addDestination(floor, None)
-      log.info(s"Destinations for ${self} now include : ${destinations.toList}")
+      log.info(Console.MAGENTA + s"Destinations for ${self} now include : ${destinations.toList}" + Console.WHITE)
   }
 }

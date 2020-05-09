@@ -6,7 +6,9 @@ import com.rikus.dao.Direction.Direction
 import spray.json._
 
 val destinations: scala.collection.mutable.ListBuffer[(Int, Option[Direction])] = ListBuffer.empty[(Int, Option[Direction])] //todo : Fix to incorporate direction into destinations
+
 destinations += ((1, Some(Direction.UP)))
+println("tail : " + destinations.tail.isEmpty)
 
 println(destinations)
 
@@ -21,3 +23,4 @@ println(destinations)
 
 addDestination(3,None)
 println(destinations)
+
