@@ -94,11 +94,11 @@ case class Elevator(id: Int, initialState: (Int, Int), numberOfFloors: Int) exte
         }
         log.info("Future Destination : " + futureDestination)
 
-        val goingTo = futureDestination
-        log.info(Console.BLUE + "Going to " + goingTo.toString() + Console.WHITE)
-        destinations -= goingTo
+
+        log.info(Console.BLUE + "Going to " + futureDestination.toString() + Console.WHITE)
+        destinations -= futureDestination
         log.info(Console.MAGENTA + s"Destinations for ${self} now include : ${destinations.toList}" + Console.WHITE)
-        goingTo
+        futureDestination
       case None =>
         log.info("No known next destination")
         (currentStatus.destinationFloor, None)
