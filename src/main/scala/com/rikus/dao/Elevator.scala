@@ -16,28 +16,28 @@ case class Elevator(id: Int, initialState: (Int, Int), numberOfFloors: Int) exte
     val nextDest = destinations.headOption match {
       case Some((floorDest, direction)) => //always go to the oldest destination first
         val futureDestination = acceleration match {
-          case x if x > 0 => {
-            log.info(Console.CYAN + "going up" + Console.WHITE)
-            val oldDestination = (floorDest, direction)
-            //if there is a destination floor smaller and on the same direction(for pickups) go there
-            val nextStepUp = ascendingDestinations.headOption match {
-              case Some(destination) =>
-                destination match {
-                  case (floor, Some(direction)) =>
-                    if (direction == Direction.UP)
-                      destination
-                    else
-                      oldDestination
-                  case (floor, None) =>
-                    destination
-                }
-              case None => oldDestination
-            }
-            log.info("Next destionation UP : " + nextStepUp)
-            nextStepUp
-          } //going up
+//          case x if x > 0 => {
+//            log.info(Console.CYAN + "going up" + Console.WHITE)
+//            val oldDestination = (floorDest, direction)
+//            //if there is a destination floor smaller and on the same direction(for pickups) go there
+//            val nextStepUp = ascendingDestinations.headOption match {
+//              case Some(destination) =>
+//                destination match {
+//                  case (floor, Some(direction)) =>
+//                    if (direction == Direction.UP)
+//                      destination
+//                    else
+//                      oldDestination
+//                  case (floor, None) =>
+//                    destination
+//                }
+//              case None => oldDestination
+//            }
+//            log.info("Next destionation UP : " + nextStepUp)
+//            nextStepUp
+//          } //going up
 
-          case x if x == 0 => {
+          case x => {
             log.info(Console.CYAN + "standing still" + Console.WHITE)
             val oldDestination = (floorDest, direction)
 
@@ -97,26 +97,26 @@ case class Elevator(id: Int, initialState: (Int, Int), numberOfFloors: Int) exte
             nextStep
           } //standstill
 
-          case x if x < 0 => {
-            log.info(Console.CYAN + "going down" + Console.WHITE)
-            val oldDestination = (floorDest, direction)
-            //if there is a destination floor smaller and on the same direction(for pickups) go there
-            val nextStepDown = ascendingDestinations.reverse.headOption match {
-              case Some(destination) =>
-                destination match {
-                  case (floor, Some(direction)) =>
-                    if (direction == Direction.DOWN)
-                      destination
-                    else
-                      oldDestination
-                  case (floor, None) =>
-                    destination
-                }
-              case None => oldDestination
-            }
-            log.info("Next destionation DOWN : " + nextStepDown)
-            nextStepDown
-          } // going down
+//          case x if x < 0 => {
+//            log.info(Console.CYAN + "going down" + Console.WHITE)
+//            val oldDestination = (floorDest, direction)
+//            //if there is a destination floor smaller and on the same direction(for pickups) go there
+//            val nextStepDown = ascendingDestinations.reverse.headOption match {
+//              case Some(destination) =>
+//                destination match {
+//                  case (floor, Some(direction)) => //pickup
+//                    if (direction == Direction.DOWN)
+//                      destination
+//                    else
+//                      oldDestination
+//                  case (floor, None) => //dropOff
+//                    destination
+//                }
+//              case None => oldDestination
+//            }
+//            log.info("Next destionation DOWN : " + nextStepDown)
+//            nextStepDown
+//          } // going down
         }
         log.info("Future Destination : " + futureDestination)
         //        val goingTo = futureDestination.headOption match {
