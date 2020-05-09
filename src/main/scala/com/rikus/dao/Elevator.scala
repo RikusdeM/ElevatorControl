@@ -92,9 +92,6 @@ case class Elevator(id: Int, initialState: (Int, Int), numberOfFloors: Int) exte
           nextStep
           //standstill
         }
-        log.info("Future Destination : " + futureDestination)
-
-
         log.info(Console.BLUE + "Going to " + futureDestination.toString() + Console.WHITE)
         destinations -= futureDestination
         log.info(Console.MAGENTA + s"Destinations for ${self} now include : ${destinations.toList}" + Console.WHITE)
@@ -122,7 +119,7 @@ case class Elevator(id: Int, initialState: (Int, Int), numberOfFloors: Int) exte
       addDestination(floor, Some(direction)) //add destination with direction
 
     case stepRequest: step =>
-      log.info(s"Stepping to next point")
+      log.info(Console.BLUE + s"Stepping to next point" + Console.WHITE)
       currentStatus = currentStatus.copy(currentStatus.destinationFloor, nextDestination._1) //change current status to next destination and remove that destination from pool
     case dropOff(floor) =>
       addDestination(floor, None)
