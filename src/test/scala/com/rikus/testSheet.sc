@@ -7,11 +7,6 @@ import spray.json._
 
 val destinations: scala.collection.mutable.ListBuffer[(Int, Option[Direction])] = ListBuffer.empty[(Int, Option[Direction])] //todo : Fix to incorporate direction into destinations
 
-
-val a = true || false || false
-
-
-
 val addDestination = (floor: Int, direction: Option[Direction]) =>
   if (!(destinations.contains((floor, None)) ||
     destinations.contains((floor, Some(Direction.UP))) ||
@@ -31,3 +26,5 @@ println(destinations)
 
 addDestination(3, Some(Direction.UP))
 println(destinations)
+
+
