@@ -1,5 +1,10 @@
 # Elevator Control System [Scala Coding Challenge]
 
+# Table of Contents
+1. [Solution](#solution)
+2. [Data Structures](#data-structures)
+3. [Build & Run](#build--run)
+
 ## Solution
 Originally I started with the First Come First Serve approach to simulate my solution.
 After thinking about all the intricacies of such an elevator system I came up with a better more efficient solution.
@@ -234,7 +239,9 @@ If using postman, import the collection [elevatorControl.postman_collection.json
 ### Create an elevator
 
 #### Request :
-`$ curl --location --request GET 'localhost:8080/ElevatorControl/createElevator/1'`
+```bash
+$ curl --location --request GET 'localhost:8080/ElevatorControl/createElevator/1'
+```
 #### Response :
 `creating`
 #### Logs :
@@ -245,7 +252,9 @@ Actor[akka://ElevatorControlServer/user/ElevatorSupervisor/elevator-1#-122957875
 ### Query the status of all the elevators
 
 #### Request :
-`$ curl --location --request GET 'localhost:8080/ElevatorControl/status'`
+```bash
+$ curl --location --request GET 'localhost:8080/ElevatorControl/status'
+```
 #### Response :
 `getting status ...`
 #### Logs :
@@ -256,7 +265,9 @@ Actor[akka://ElevatorControlServer/user/ElevatorSupervisor/elevator-1#-122957875
 ### Request an elevator to do a pickup at specified floor with intended direction of travel
 
 #### Request :
-`$ curl --location --request GET 'localhost:8080/ElevatorControl/pickup?id=<elevatorId>&floor=<floorNumber>&direction=<up/down>'`
+```bash
+$ curl --location --request GET 'localhost:8080/ElevatorControl/pickup?id=<elevatorId>&floor=<floorNumber>&direction=<up/down>'
+```
 
 where the query parameters are :
 
@@ -276,7 +287,9 @@ Destinations for Actor[akka://ElevatorControlServer/user/ElevatorSupervisor/elev
 ### Request an elevator to do a drop off at specified floor
 
 #### Request :
-`$ curl --location --request GET 'localhost:8080/ElevatorControl/dropOff?id=<elevatorId>&floor=<floorNumber>'`
+```bash
+$ curl --location --request GET 'localhost:8080/ElevatorControl/dropOff?id=<elevatorId>&floor=<floorNumber>'`
+```
 
 where the query parameters are :
 
@@ -294,7 +307,9 @@ Destinations for Actor[akka://ElevatorControlServer/user/ElevatorSupervisor/elev
 ### Step through to the next state
 
 #### Request :
-`$ curl --location --request GET 'localhost:8080/ElevatorControl/step'`
+```bash
+$ curl --location --request GET 'localhost:8080/ElevatorControl/step'
+```
 
 #### Response :
 `step`
