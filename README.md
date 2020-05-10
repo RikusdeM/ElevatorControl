@@ -173,6 +173,44 @@ The simulated movement of the Elevator is as follows :
  
 ## Data Structures
 
+The project makes use of [Lightbend Akka](https://akka.io/) Actor framework to construct the Elevator System.
+Akka HTTP is used to interface with the actor system.
+
+
+ElevatorControl uses a `ElevatorSupervisor(numberOfFloors: Int, initialState:(Int,Int))` to construct 
+`Elevator(id: Int, initialState: (Int, Int), numberOfFloors: Int)` children. The actor system is instantiated
+through the `QuickstartApp` and passed to the `Routes()`.  Each route ["createElevator","pickup","dropOff","step","status"]
+sends their respective command to the supervisor actor i.e. `ElevatorSupervisor`.
+
+
+### ElevatorSupervisor(numberOfFloors: Int, initialState:(Int,Int))
+#### Commands:
+* `createElevator(id:Int)` 
+* `status()`      
+* `step()`
+* `elevatorStatus(currentFloor: Int, destinationFloor: Int)`
+* `pickupReq(id: Int, floor: Int, direction: Direction)`
+    * Direction => `UP`/`DOWN`        
+* `dropOffReq(id: Int, floor: Int)`
+      
+### Elevator(id: Int, initialState: (Int, Int), numberOfFloors: Int)
+#### Data structures:
+```
+var currentStatus: elevatorStatus = elevatorStatus(initialState._1, initialState._2)
+val destinations: scala.collection.mutable.ListBuffer[(Int, Option[Direction])] = ListBuffer.empty[(Int, Option[Direction])]
+```
+`currentStatus` is returned when a `status()` request is sent.
+
+
+`destinations` is a listbuffer that is used to store the future destinations of the elevator. 
+
+    
+#### Commands:
+* `status()`
+* `pickup(floor:Int,direction:Direction)`
+* `step()`
+* `dropOff(floor:Int)`
+
 ## Build & Run
 This project utilizes SBT and Java.
 Tested versions :
