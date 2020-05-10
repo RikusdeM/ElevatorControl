@@ -16,7 +16,7 @@ on the queue as the most important future destination, whilst dropping off and p
 only if their intended direction is in the direction of the original move. This way the person that has been waiting 
 the longest gets to go where they want, whilst satisfying some of the intermediate requests on the way there.
 
-As a good simulation of such a scenario would be the following situation :  
+A good simulation of such a scenario would be the following situation :  
 Lets say we have the following events : 
  * Initial default position of the elevator (1:CurrentFloor,1:DestinationFloor)
  * Drop-off #4
@@ -24,6 +24,7 @@ Lets say we have the following events :
  * Pickup #2 (DOWN)
  * Drop-off #6
  * ===================================STEP=================================== (assume that here has to have been some step already)
+ * Status
  * Drop-off #8
  * Pickup #7 (DOWN)
  * Pickup #5 (UP)
@@ -240,8 +241,13 @@ If using postman, import the collection [elevatorControl.postman_collection.json
 
 #### Request :
 ```bash
-$ curl --location --request GET 'localhost:8080/ElevatorControl/createElevator/1'
+$ curl --location --request GET 'localhost:8080/ElevatorControl/createElevator/<elevatorId>'
 ```
+
+where 
+
+`<elevatorId>:Int` [eg: 1]
+
 #### Response :
 `creating`
 #### Logs :
@@ -288,7 +294,7 @@ Destinations for Actor[akka://ElevatorControlServer/user/ElevatorSupervisor/elev
 
 #### Request :
 ```bash
-$ curl --location --request GET 'localhost:8080/ElevatorControl/dropOff?id=<elevatorId>&floor=<floorNumber>'`
+$ curl --location --request GET 'localhost:8080/ElevatorControl/dropOff?id=<elevatorId>&floor=<floorNumber>'
 ```
 
 where the query parameters are :
