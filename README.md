@@ -1,6 +1,33 @@
 # Elevator Control System [Scala Coding Challenge]
 
 ## Solution
+Originally I started with the First Come First Serve approach to simulate my solution.
+After thinking about all the intricacies of such an elevator system I came up with a better more efficient solution.
+
+This solution can be summarized as follows.
+Surely if you are the first person at an elevator terminal you would want to be helped first, hence there is some
+merit to the FCFS solution.  The way we overcome the inefficiency of such a solution is by respecting your first request 
+on the queue as the most important future destination, whilst dropping off and picking up passengers on the way,
+only if their intended direction is in the direction of the original move. This way the person that has been waiting 
+the longest gets to go where they want, whilst satisfying some of the intermediate requests on the way there.
+
+As a good simulation of such a scenario would be the following situation :  
+Lets say we have the following events : 
+ * Initial default position of the elevator (1:CurrentFloor,1:DestinationFloor)
+ * Drop-off #4
+ * Pickup #3 (DOWN)
+ * Pickup #2 (DOWN)
+ * Drop-off #6
+ * ===================================STEP=================================== (assume that here has to have been some step already)
+ * Drop-off #1
+ * Pickup #3 (UP)
+ * Drop-off #8
+ * Pickup #7 (DOWN)
+ 
+The simulated movement of the Elevator is as follows :
+ 
+
+    
 
 ## Data Structures
 
@@ -29,7 +56,9 @@ The following HTTP commands can be used to control the elevator system.
 #### Response :
 `creating`
 #### Logs :
-`Actor[akka://ElevatorControlServer/user/ElevatorSupervisor/elevator-1#-1229578759] has been created`
+```bash
+Actor[akka://ElevatorControlServer/user/ElevatorSupervisor/elevator-1#-1229578759] has been created
+```
 
 ### Query the status of all the elevators
 
@@ -38,7 +67,9 @@ The following HTTP commands can be used to control the elevator system.
 #### Response :
 `getting status ...`
 #### Logs :
-`Actor[akka://ElevatorControlServer/user/ElevatorSupervisor/elevator-1#-1229578759] has been created`
+```bash
+[2020-05-10 09:41:54,760] [INFO] [com.rikus.dao.ElevatorSupervisor] [ElevatorControlServer-akka.actor.default-dispatcher-20] [akka://ElevatorControlServer/user/ElevatorSupervisor] - Actor[akka://ElevatorControlServer/user/ElevatorSupervisor/elevator-1#-1229578759] : {"currentFloor":1,"destinationFloor":1}
+```
 
 ### Request an elevator to do a pickup at specified floor with intended direction of travel
 
@@ -56,7 +87,9 @@ where the query parameters are :
 #### Response :
 `new pickup`
 #### Logs :
-`Destinations for Actor[akka://ElevatorControlServer/user/ElevatorSupervisor/elevator-1#-1229578759] now include : List((1,Some(UP)))`
+```bash
+Destinations for Actor[akka://ElevatorControlServer/user/ElevatorSupervisor/elevator-1#-1229578759] now include : List((1,Some(UP)))
+```
 
 ### Request an elevator to do a drop off at specified floor
 
@@ -72,7 +105,9 @@ where the query parameters are :
 #### Response :
 `new dropOff`
 #### Logs :
-`Destinations for Actor[akka://ElevatorControlServer/user/ElevatorSupervisor/elevator-1#-1229578759] now include : List((2,None))`
+```bash
+Destinations for Actor[akka://ElevatorControlServer/user/ElevatorSupervisor/elevator-1#-1229578759] now include : List((2,None))
+```
 
 ### Step through to the next state
 
