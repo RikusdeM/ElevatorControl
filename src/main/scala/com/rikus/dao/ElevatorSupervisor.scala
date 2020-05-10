@@ -5,11 +5,11 @@ import com.rikus.dao
 import com.rikus.JsonFormats._
 import spray.json._
 
-case class ElevatorSupervisor(numberOfFloors: Int) extends Actor with ActorLogging {
+case class ElevatorSupervisor(numberOfFloors: Int, initialState:(Int,Int)) extends Actor with ActorLogging {
 
   def receive: Receive = {
     case createElevator(id) =>
-      val elevatorRef = context.actorOf(Props(new Elevator(id, (1, 1), numberOfFloors)), name = s"elevator-${id}")
+      val elevatorRef = context.actorOf(Props(new Elevator(id, initialState, numberOfFloors)), name = s"elevator-${id}")
       log.info(Console.YELLOW + s"${elevatorRef.toString()} has been created" + Console.WHITE)
     case statusRequest: status => context.children.map(child => {
       log.info(s"Calling Child status : ${child.toString()}")

@@ -1,0 +1,121 @@
+{
+	"info": {
+		"_postman_id": "e45429e9-9573-456c-b379-e3cbe1ed7ee3",
+		"name": "elevatorControl",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "createElevator",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": ""
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "status",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/ElevatorControl/status",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"ElevatorControl",
+						"status"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "step",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/ElevatorControl/step",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"ElevatorControl",
+						"step"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "pickup",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/ElevatorControl/pickup?id=1&floor=5&direction=down",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"ElevatorControl",
+						"pickup"
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "1"
+						},
+						{
+							"key": "floor",
+							"value": "5"
+						},
+						{
+							"key": "direction",
+							"value": "down"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "dropOff",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/ElevatorControl/dropOff?id=1&floor=6",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"ElevatorControl",
+						"dropOff"
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "1"
+						},
+						{
+							"key": "floor",
+							"value": "6"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}

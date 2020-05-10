@@ -25,7 +25,9 @@ class Routes()(implicit val system: ActorSystem) extends LazyLogging {
   import QuickstartApp._
   import Configurations.configFactory
 
-  val elevatorSystemSupervisor = system.actorOf(Props(new ElevatorSupervisor(Configurations.configFactory.getInt("my-app.elevator.totalFloors"))), name = "ElevatorSupervisor")
+  val totalFloors = Configurations.configFactory.getInt("my-app.elevator.totalFloors")
+  val initialState = (Configurations.configFactory.getInt("my-app.elevator.initialStartingFloor"),Configurations.configFactory.getInt("my-app.elevator.initialDestinationFloor"))
+  val elevatorSystemSupervisor = system.actorOf(Props(new ElevatorSupervisor(totalFloors,initialState)), name = "ElevatorSupervisor")
 
   def myUserPassAuthenticator(credentials: Credentials): Option[String] =
     credentials match {
