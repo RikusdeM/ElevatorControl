@@ -226,10 +226,14 @@ Tested versions :
     Java -> 8
 
 ### Building
-` $ sbt clean compile `
+```bash
+$ sbt clean compile
+```
 
 ### Running
-`$ sbt run`
+```bash
+$ sbt run
+```
 
 ## Usage Instructions
 
