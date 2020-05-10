@@ -74,7 +74,6 @@ case class Elevator(id: Int, initialState: (Int, Int), numberOfFloors: Int) exte
     val nextDest = destinations.headOption match {
       case Some((floorDest, direction)) => //always go to the oldest destination first
         val futureDestination = {
-          log.info(Console.CYAN + "standing still" + Console.WHITE)
           val oldDestination = (floorDest, direction)
 
           val nextStep =
