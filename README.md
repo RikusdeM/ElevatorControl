@@ -238,7 +238,7 @@ If using postman, import the collection [elevatorControl.postman_collection.json
 #### Response :
 `creating`
 #### Logs :
-```bash
+```
 Actor[akka://ElevatorControlServer/user/ElevatorSupervisor/elevator-1#-1229578759] has been created
 ```
 
@@ -249,7 +249,7 @@ Actor[akka://ElevatorControlServer/user/ElevatorSupervisor/elevator-1#-122957875
 #### Response :
 `getting status ...`
 #### Logs :
-```bash
+```
 [2020-05-10 09:41:54,760] [INFO] [com.rikus.dao.ElevatorSupervisor] [ElevatorControlServer-akka.actor.default-dispatcher-20] [akka://ElevatorControlServer/user/ElevatorSupervisor] - Actor[akka://ElevatorControlServer/user/ElevatorSupervisor/elevator-1#-1229578759] : {"currentFloor":1,"destinationFloor":1}
 ```
 
@@ -269,7 +269,7 @@ where the query parameters are :
 #### Response :
 `new pickup`
 #### Logs :
-```bash
+```
 Destinations for Actor[akka://ElevatorControlServer/user/ElevatorSupervisor/elevator-1#-1229578759] now include : List((1,Some(UP)))
 ```
 
@@ -287,7 +287,7 @@ where the query parameters are :
 #### Response :
 `new dropOff`
 #### Logs :
-```bash
+```
 Destinations for Actor[akka://ElevatorControlServer/user/ElevatorSupervisor/elevator-1#-1229578759] now include : List((2,None))
 ```
 
@@ -299,7 +299,7 @@ Destinations for Actor[akka://ElevatorControlServer/user/ElevatorSupervisor/elev
 #### Response :
 `step`
 #### Logs :
-```bash
+```
 [2020-05-10 10:03:43,639] [INFO] [com.rikus.dao.Elevator] [ElevatorControlServer-akka.actor.default-dispatcher-18] [akka://ElevatorControlServer/user/ElevatorSupervisor/elevator-1] - Stepping to next point
 [2020-05-10 10:03:43,643] [INFO] [com.rikus.dao.Elevator] [ElevatorControlServer-akka.actor.default-dispatcher-20] [akka://ElevatorControlServer/user/ElevatorSupervisor/elevator-1] - Going to (2,None)
 [2020-05-10 10:03:43,644] [INFO] [com.rikus.dao.Elevator] [ElevatorControlServer-akka.actor.default-dispatcher-20] [akka://ElevatorControlServer/user/ElevatorSupervisor/elevator-1] - Destinations for Actor[akka://ElevatorControlServer/user/ElevatorSupervisor/elevator-1#530024638] now include : List()
