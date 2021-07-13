@@ -1,19 +1,26 @@
 import com.typesafe.config.ConfigFactory
 import com.typesafe.sbt.packager.docker._
 
-val conf = com.typesafe.config.ConfigFactory.parseFile(new File("project/application.conf")).resolve()
+val conf = com.typesafe.config.ConfigFactory
+  .parseFile(new File("project/application.conf"))
+  .resolve()
+val appConf = com.typesafe.config.ConfigFactory
+  .parseFile(new File("src/main/resources/application.conf"))
+  .resolve()
 
 lazy val akkaHttpVersion = "10.1.11"
 lazy val akkaVersion = "2.6.5"
 
 version in Docker := version.value
 
-lazy val root = (project in file(".")).
-  settings(
-    inThisBuild(List(
-      organization := "com.rikus",
-      scalaVersion := "2.13.1"
-    )),
+lazy val root = (project in file("."))
+  .settings(
+    inThisBuild(
+      List(
+        organization := "com.rikus",
+        scalaVersion := "2.13.1"
+      )
+    ),
     name := "ElevatorControl",
     version := conf.getString("version"),
     resolvers ++= Seq(
@@ -29,15 +36,16 @@ lazy val root = (project in file(".")).
       "com.typesafe.scala-logging" %% "scala-logging" % "3.9.2",
       "ch.qos.logback" % "logback-classic" % "1.2.3",
       "com.sksamuel.avro4s" %% "avro4s-core" % "3.0.9",
-
       "com.typesafe.akka" %% "akka-http-testkit" % akkaHttpVersion % Test,
       "com.typesafe.akka" %% "akka-actor-testkit-typed" % akkaVersion % Test,
       "org.scalatest" %% "scalatest" % "3.1.1" % Test
     )
-  ).enablePlugins(JavaAppPackaging)
+  )
+  .enablePlugins(JavaAppPackaging)
 
+lazy val servicePort = appConf.getString("myApp.routes.servicePort")
 dockerCommands ++= Seq(
   Cmd("USER", "root"),
-  Cmd("EXPOSE", "8080")
+  Cmd("EXPOSE", servicePort)
 )
-dockerExposedPorts ++= Seq(8080)
+dockerExposedPorts ++= Seq(servicePort.toInt)

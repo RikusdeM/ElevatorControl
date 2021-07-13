@@ -1,4 +1,4 @@
-# Elevator Control System [Scala Coding Challenge]
+# Elevator Control System 
 
 # Table of Contents
 1. [Solution](#solution)

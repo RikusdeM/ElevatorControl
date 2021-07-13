@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "e45429e9-9573-456c-b379-e3cbe1ed7ee3",
+		"_postman_id": "8cbdb3b7-1ba6-4ccd-946f-06ed08a36519",
 		"name": "elevatorControl",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -11,7 +11,22 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": ""
+					"raw": "localhost:8080/ElevatorControl/createElevator/:id",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"ElevatorControl",
+						"createElevator",
+						":id"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": "1"
+						}
+					]
 				}
 			},
 			"response": []
@@ -116,6 +131,5 @@
 			},
 			"response": []
 		}
-	],
-	"protocolProfileBehavior": {}
+	]
 }
