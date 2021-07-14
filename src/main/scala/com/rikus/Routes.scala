@@ -79,9 +79,11 @@ class Routes()(implicit val system: ActorSystem)
           onComplete(
             elevatorSystemSupervisor ? createElevator(elevatorId.toInt)
           ) {
-            case Success(_) =>
+            case Success(elevatorRef) =>
               complete {
-                HttpEntity(ContentTypes.`application/json`, CREATING)
+                HttpEntity(ContentTypes.`application/json`,
+                  s"""{"CREATING ELEVATOR" : "$elevatorRef"}"""
+                )
               }
 
             case Failure(error) =>
@@ -109,9 +111,11 @@ class Routes()(implicit val system: ActorSystem)
                   dir
                 )
               } {
-                case Success(_) =>
+                case Success(destinations) =>
                   complete {
-                    HttpEntity(ContentTypes.`application/json`, PICKUP)
+                    HttpEntity(ContentTypes.`application/json`,
+                      s"""{"DESTINATIONS" : "$destinations"}"""
+                    )
                   }
 
                 case Failure(error) =>
@@ -131,9 +135,11 @@ class Routes()(implicit val system: ActorSystem)
                   floor.get.toInt
                 )
               } {
-                case Success(_) =>
+                case Success(destinations) =>
                   complete {
-                    HttpEntity(ContentTypes.`application/json`, DROPOFF)
+                    HttpEntity(ContentTypes.`application/json`,
+                      s"""{"DESTINATIONS" : "$destinations"}"""
+                    )
                   }
 
                 case Failure(error) =>
@@ -149,9 +155,11 @@ class Routes()(implicit val system: ActorSystem)
             onComplete {
               elevatorSystemSupervisor ? step()
             } {
-              case Success(_) =>
+              case Success(status) =>
                 complete {
-                  HttpEntity(ContentTypes.`application/json`, STEP)
+                  HttpEntity(ContentTypes.`application/json`,
+                    s"""{"STATUS" : "$status"}"""
+                  )
                 }
 
               case Failure(error) =>
@@ -166,11 +174,11 @@ class Routes()(implicit val system: ActorSystem)
             onComplete {
               elevatorSystemSupervisor ? status()
             } {
-              case Success(_) =>
+              case Success(status) =>
                 complete {
                   HttpEntity(
                     ContentTypes.`application/json`,
-                    STATUS
+                    s"""{"STATUS" : "$status"}"""
                   )
                 }
 

@@ -140,17 +140,19 @@ case class Elevator(id: Int, initialState: (Int, Int), numberOfFloors: Int)(
   def receive: Receive = {
     case statusRequest: status =>
       log.info(s"Elevator ${this.id} sending status ...")
-      sender().forward(Future.successful(currentStatus))
+      sender().forward(currentStatus)
     case pickup(floor, direction) =>
       addDestination(floor, Some(direction)) //add destination with direction
-
+      sender().forward(destinations)
     case stepRequest: step =>
       log.info(Console.BLUE + s"Stepping to next point" + Console.WHITE)
       currentStatus = currentStatus.copy(
         currentStatus.destinationFloor,
         nextDestination._1
       ) //change current status to next destination and remove that destination from pool
+      sender().forward(currentStatus)
     case dropOff(floor) =>
       addDestination(floor, None)
+      sender().forward(destinations)
   }
 }

@@ -24,15 +24,15 @@ case class ElevatorSupervisor(numberOfFloors: Int, initialState: (Int, Int))(
       log.info(
         Console.YELLOW + s"${elevatorRef.toString()} has been created" + Console.WHITE
       )
-      sender().forward(Future.successful())
+      sender().forward(elevatorRef.toString())
     case statusRequest: status =>
       context.children.map(child => {
         log.info(s"Calling Child status : ${child.toString()}")
-        childAnswerResult(child ? statusRequest)
+        childAnswerResult(child ? statusRequest, sender())
       }) //query all children elevators
     case stepRequest: step =>
       context.children.foreach(child =>
-        childAnswerResult(child ? stepRequest)
+        childAnswerResult(child ? stepRequest, sender())
       ) //step all children elevators
     case elevatorStatus: elevatorStatus =>
       log.info(
@@ -41,13 +41,15 @@ case class ElevatorSupervisor(numberOfFloors: Int, initialState: (Int, Int))(
     case pickupReq(id, floor, direction) =>
       context.child(s"elevator-${id}") match {
         case Some(childRef) =>
-          childAnswerResult(childRef ? dao.pickup(floor, direction))
+          childAnswerResult(childRef ? dao.pickup(floor, direction), sender())
         case None => log.info(s"No such child with id # ${id}")
       }
     case dropOffReq(id, floor) =>
       context.child(s"elevator-${id}") match {
-        case Some(childRef) => childAnswerResult(childRef ? dropOff(floor))
-        case None           => log.info(s"No such child with id # ${id}")
+        case Some(childRef) => {
+          childAnswerResult(childRef ? dropOff(floor), sender())
+        }
+        case None => log.info(s"No such child with id # ${id}")
       }
   }
 }
